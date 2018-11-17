@@ -100,6 +100,17 @@ class IntuitiveExtendedBloomFilter(BloomFilter):
     def is_marked(self, i):
         return min([self.bloom_filter[h] for h in self.hash(i)]) >= self.r
 
+    def has_false_positive(self, i, c):
+        """
+        Check if key i has a false positive. If returns True, when c is the expected
+            number of times inserted, then we have a false-positive
+        :param i: the element
+        :param c: value to check against how many times this element was inserted
+        :return: boolean if the minimum count for this element is not equal to c
+        """
+        m = min([self.bloom_filter[h] for h in self.hash(i)])
+        return m != c
+
     def insert(self, i):
         for h in set(self.hash(i)):
             # make sure not to increment past r, in case of overflow
