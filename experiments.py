@@ -1,6 +1,8 @@
 from bloom_filter import RevisedExtendedBloomFilter
 from random import sample
 from random import shuffle
+from random import randint
+import numpy as np
 
 """
 This is a standard prime number used in hashing, as referenced by the paper.
@@ -51,7 +53,6 @@ def experiment3(n, m, k):
     """
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
-
     all_keys = distinct_keys * 20
     shuffle(all_keys)
     for e in all_keys:
@@ -60,6 +61,110 @@ def experiment3(n, m, k):
     # Check the false-positive rate
     print("Experiment 3:", calc_false_positive_rate(bf, distinct_keys, 20))
 
+
+"""
+Error checking for the following experiments have to be updated to account for random c values
+"""
+
+def experiment4(n, m, k):
+    """
+    Run experiment 4, where each key is inserted a random number 20 or less times, and all insertions are in a random order
+    :param n: number of distinct keys
+    :param m: the size of the bloom filter
+    :param k: the number of hashes used by the bloom filter
+    """
+    distinct_keys = generate_keys(n)
+    bf = RevisedExtendedBloomFilter(m, k)
+    all_keys=[]
+    for e in distinct_keys:
+        c = randint(0,20)
+        for _ in range(c):
+            all_keys.append(e)
+    shuffle(all_keys)
+    for e in all_keys:
+        bf.insert(e)
+    # Check the false-positive rate
+    print("Experiment 4:", calc_false_positive_rate(bf, distinct_keys, 20))
+
+def experiment5(n, m, k):
+    """
+    Run experiment 5, where each key is inserted a random number 20 or less times
+    :param n: number of distinct keys
+    :param m: the size of the bloom filter
+    :param k: the number of hashes used by the bloom filter
+    """
+    distinct_keys = generate_keys(n)
+    bf = RevisedExtendedBloomFilter(m, k)
+    all_keys=[]
+    for e in distinct_keys:
+        c = randint(0,20)
+        for _ in range(c):
+            all_keys.append(e)
+    for e in all_keys:
+        bf.insert(e)
+    # Check the false-positive rate
+    print("Experiment 5:", calc_false_positive_rate(bf, distinct_keys, 20))
+
+
+def experiment6(n, m, k):
+    """
+    Run experiment 6, where each key is inserted a poisson random variable with lambda=10 times
+    :param n: number of distinct keys
+    :param m: the size of the bloom filter
+    :param k: the number of hashes used by the bloom filter
+    """
+    distinct_keys = generate_keys(n)
+    bf = RevisedExtendedBloomFilter(m, k)
+    all_keys=[]
+    for e in distinct_keys:
+        c = np.random.poisson(10)
+        for _ in range(c):
+            all_keys.append(e)
+    for e in all_keys:
+        bf.insert(e)
+    # Check the false-positive rate
+    print("Experiment 6:", calc_false_positive_rate(bf, distinct_keys, 20))
+
+
+def experiment7(n, m, k):
+    """
+    Run experiment 7, where each key is inserted a poisson random variable with lambda=20 times
+    :param n: number of distinct keys
+    :param m: the size of the bloom filter
+    :param k: the number of hashes used by the bloom filter
+    """
+    distinct_keys = generate_keys(n)
+    bf = RevisedExtendedBloomFilter(m, k)
+    all_keys=[]
+    for e in distinct_keys:
+        c = np.random.poisson(20)
+        for _ in range(c):
+            all_keys.append(e)
+    for e in all_keys:
+        bf.insert(e)
+    # Check the false-positive rate
+    print("Experiment 7:", calc_false_positive_rate(bf, distinct_keys, 20))
+
+
+def experiment8(n, m, k):
+    """
+    Run experiment 8, where each key is inserted a random number 40 or less times, and all insertions are in a random order
+    :param n: number of distinct keys
+    :param m: the size of the bloom filter
+    :param k: the number of hashes used by the bloom filter
+    """
+    distinct_keys = generate_keys(n)
+    bf = RevisedExtendedBloomFilter(m, k)
+    all_keys=[]
+    for e in distinct_keys:
+        c = randint(0,40)
+        for _ in range(c):
+            all_keys.append(e)
+    shuffle(all_keys)
+    for e in all_keys:
+        bf.insert(e)
+    # Check the false-positive rate
+    print("Experiment 8:", calc_false_positive_rate(bf, distinct_keys, 20))
 
 def generate_keys(n):
     """
@@ -76,7 +181,8 @@ def calc_false_positive_rate(bf, keys, c):
         if bf.has_false_positive(e, c):
             fp += 1
 
-    return fp/n
+    #return fp/(n*c)
+    return fp/(n)
 
 
 N = 10000
@@ -85,3 +191,8 @@ K = 6
 experiment1(N, M, K)
 experiment2(N, M, K)
 experiment3(N, M, K)
+experiment4(N, M, K)
+experiment5(N, M, K)
+experiment6(N, M, K)
+experiment7(N, M, K)
+experiment8(N, M, K)
