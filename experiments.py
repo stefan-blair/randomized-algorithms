@@ -5,6 +5,7 @@ from random import randint
 from random import random
 from math import floor
 import numpy as np
+import multiprocessing as mp
 
 # from http://code.activestate.com/recipes/360461-fisher-yates-shuffle/
 def fisher_yates_shuffle(ary):
@@ -221,6 +222,13 @@ def calc_false_positive_rate_random(bf, keys, c_list):
 experiments = [experiment1, experiment2, experiment3, experiment4,
                experiment5, experiment6, experiment7, experiment8]
 
+
+def proc_experiments(rounds, e, n, m, k, output):
+    results = []
+    for _ in range(rounds):
+        results.append(experiments[e](n, m, k))
+    output.put(results)
+
 # number of rounds to run each configuration on an experiment
 #  in the paper it is 1000
 NUM_ROUNDS = 100
@@ -229,8 +237,8 @@ NUM_ROUNDS = 100
 M = 40000
 K = 6 # 4, 6, 8
 
-# NM = [0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25]
-NM = np.linspace(0.05, 0.25, 11)# values of N/M
+NM = [0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25]
+# NM = np.linspace(0.05, 0.25, 11)# values of N/M
 
 # Create csv file for output
 filename = "output-{0}-{1}.csv".format(M, K)
@@ -246,11 +254,20 @@ for nm in NM:
     for e in range(8):
         fp_rates = []
         print("Running Experiment", e+1)
-        for i in range(NUM_ROUNDS):
-            if i % 5 == 0:
-                print("  iter: ", i)
-            fp_rates.append(experiments[e](N, M, K))
+        num_procs = 4
+        output = mp.Queue()
+        processes = [mp.Process(target=proc_experiments, args=(int(NUM_ROUNDS/num_procs), e, N, M, K, output)) for _ in range(num_procs)]
+        for p in processes:
+            p.start()
+        for p in processes:
+            p.join()
 
+        # for i in range(NUM_ROUNDS):
+        #     if i % 5 == 0:
+        #         print("  iter: ", i)
+        #     fp_rates.append(experiments[e](N, M, K))
+        for p in processes:
+            fp_rates = fp_rates + output.get()
         f.write(",{0},{1}".format(np.mean(fp_rates), np.std(fp_rates)))
 
     f.write("\n")
