@@ -35,7 +35,7 @@ def experiment1(n, m, k):
             bf.insert(e)
 
     # Check the false positive rate
-    print("Experiment 1:", calc_false_positive_rate(bf, distinct_keys, 20))
+    return calc_false_positive_rate(bf, distinct_keys, 20)
 
 
 def experiment2(n, m, k):
@@ -52,7 +52,7 @@ def experiment2(n, m, k):
             bf.insert(e)
 
     # Check the false-positive rate
-    print("Experiment 2:", calc_false_positive_rate(bf, distinct_keys, 20))
+    return calc_false_positive_rate(bf, distinct_keys, 20)
 
 
 def experiment3(n, m, k):
@@ -70,12 +70,8 @@ def experiment3(n, m, k):
         bf.insert(e)
 
     # Check the false-positive rate
-    print("Experiment 3:", calc_false_positive_rate(bf, distinct_keys, 20))
+    return calc_false_positive_rate(bf, distinct_keys, 20)
 
-
-"""
-Error checking for the following experiments have to be updated to account for random c values
-"""
 
 def experiment4(n, m, k):
     """
@@ -97,7 +93,7 @@ def experiment4(n, m, k):
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 4:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
+    return calc_false_positive_rate_random(bf, distinct_keys, c_list)
 
 def experiment5(n, m, k):
     """
@@ -118,7 +114,7 @@ def experiment5(n, m, k):
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 5:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
+    return calc_false_positive_rate_random(bf, distinct_keys, c_list)
 
 
 def experiment6(n, m, k):
@@ -141,7 +137,7 @@ def experiment6(n, m, k):
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 6:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
+    return calc_false_positive_rate_random(bf, distinct_keys, c_list)
 
 
 def experiment7(n, m, k):
@@ -164,7 +160,7 @@ def experiment7(n, m, k):
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 7:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
+    return calc_false_positive_rate_random(bf, distinct_keys, c_list)
 
 
 def experiment8(n, m, k):
@@ -187,7 +183,7 @@ def experiment8(n, m, k):
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 8:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
+    return calc_false_positive_rate_random(bf, distinct_keys, c_list)
 
 def generate_keys(n):
     """
@@ -221,14 +217,29 @@ def calc_false_positive_rate_random(bf, keys, c_list):
     # return fp/(n-zeros)
     return fp/l
 
-N = 10000
+
+experiments = [experiment1, experiment2, experiment3, experiment4,
+               experiment5, experiment6, experiment7, experiment8]
+
+# number of rounds to run each configuration on an experiment
+#  in the paper it is 1000
+NUM_ROUNDS = 10
+
+# N = 10000
 M = 80000
 K = 6
-experiment1(N, M, K)
-experiment2(N, M, K)
-experiment3(N, M, K)
-experiment4(N, M, K)
-experiment5(N, M, K)
-experiment6(N, M, K)
-experiment7(N, M, K)
-experiment8(N, M, K)
+
+# M = [80000, 160000, 320000]
+# K = [4, 6, 8]
+NM = [0.1, 0.2, 0.3] # values of N/M
+
+for nm in NM:
+    N = int(nm * M)
+
+    for e in range(8):
+        fp_rates = []
+
+        for _ in range(NUM_ROUNDS):
+            fp_rates.append(experiments[e](N, M, K))
+
+        print("n/m: ", nm, " Experiment", e+1, " mean =", np.mean(fp_rates), " stddev =", np.std(fp_rates))
