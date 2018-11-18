@@ -76,15 +76,17 @@ def experiment4(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys=[]
+    c_list={}
     for e in distinct_keys:
         c = randint(0,20)
+        c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
     shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 4:", calc_false_positive_rate(bf, distinct_keys, 20))
+    print("Experiment 4:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
 
 def experiment5(n, m, k):
     """
@@ -96,14 +98,16 @@ def experiment5(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys=[]
+    c_list={}
     for e in distinct_keys:
         c = randint(0,20)
+        c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 5:", calc_false_positive_rate(bf, distinct_keys, 20))
+    print("Experiment 5:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
 
 
 def experiment6(n, m, k):
@@ -116,14 +120,16 @@ def experiment6(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys=[]
+    c_list={}
     for e in distinct_keys:
         c = np.random.poisson(10)
+        c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 6:", calc_false_positive_rate(bf, distinct_keys, 20))
+    print("Experiment 6:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
 
 
 def experiment7(n, m, k):
@@ -136,14 +142,16 @@ def experiment7(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys=[]
+    c_list={}
     for e in distinct_keys:
         c = np.random.poisson(20)
+        c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 7:", calc_false_positive_rate(bf, distinct_keys, 20))
+    print("Experiment 7:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
 
 
 def experiment8(n, m, k):
@@ -156,15 +164,17 @@ def experiment8(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys=[]
+    c_list={}
     for e in distinct_keys:
         c = randint(0,40)
+        c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
     shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
-    print("Experiment 8:", calc_false_positive_rate(bf, distinct_keys, 20))
+    print("Experiment 8:", calc_false_positive_rate_random(bf, distinct_keys, c_list))
 
 def generate_keys(n):
     """
@@ -184,6 +194,16 @@ def calc_false_positive_rate(bf, keys, c):
     #return fp/(n*c)
     return fp/(n)
 
+def calc_false_positive_rate_random(bf, keys, c_list):
+    n = len(keys)
+    fp = 0
+    zeros = 0
+    for e in keys:
+        if c_list[e] == 0 :
+            zeros=zeros+1
+        elif bf.has_false_positive(e, c_list[e]):
+            fp += 1
+    return fp/(n-zeros)
 
 N = 10000
 M = 80000
