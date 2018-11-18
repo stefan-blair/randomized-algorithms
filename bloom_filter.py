@@ -90,7 +90,7 @@ class RazorBloomFilter(BloomFilter):
 
 class IntuitiveExtendedBloomFilter(BloomFilter):
 
-    def __init__(self, m, k, r=31):
+    def __init__(self, m, k, r=63):
         """
         :param r: the threshold for the number of hits a bloom filter element must have before being "marked"
         """

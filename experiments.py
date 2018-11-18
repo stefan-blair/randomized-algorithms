@@ -192,7 +192,7 @@ def generate_keys(n):
     Generate n distinct integers in the range [1,P-1]
     :param n: the number of distinct integers to generate
     """
-    return sample(range(1, P-1), n)
+    return sample(range(1, P), n)
 
 
 def calc_false_positive_rate(bf, keys, c):
@@ -208,13 +208,16 @@ def calc_false_positive_rate(bf, keys, c):
 def calc_false_positive_rate_random(bf, keys, c_list):
     n = len(keys)
     fp = 0
+    l = sum(c_list.values())
     zeros = 0
     for e in keys:
         if c_list[e] == 0 :
             zeros=zeros+1
         elif bf.has_false_positive(e, c_list[e]):
-            fp += 1
-    return fp/(n-zeros)
+            # fp += 1
+            fp += c_list[e]
+    # return fp/(n-zeros)
+    return fp/l
 
 N = 10000
 M = 80000
