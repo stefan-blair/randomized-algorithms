@@ -2,13 +2,24 @@ from bloom_filter import RevisedExtendedBloomFilter
 from random import sample
 from random import shuffle
 from random import randint
+from random import random
+from math import floor
 import numpy as np
 
+# from http://code.activestate.com/recipes/360461-fisher-yates-shuffle/
+def fisher_yates_shuffle(ary):
+    a=len(ary)
+    b=a-1
+    for d in range(b,0,-1):
+      e=randint(0,d)
+      if e == d:
+            continue
+      ary[d],ary[e]=ary[e],ary[d]
+    return ary
 """
 This is a standard prime number used in hashing, as referenced by the paper.
 """
 P = 2100000011
-
 
 def experiment1(n, m, k):
     """
@@ -54,7 +65,7 @@ def experiment3(n, m, k):
     distinct_keys = generate_keys(n)
     bf = RevisedExtendedBloomFilter(m, k)
     all_keys = distinct_keys * 20
-    shuffle(all_keys)
+    fisher_yates_shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
 
@@ -82,7 +93,7 @@ def experiment4(n, m, k):
         c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
-    shuffle(all_keys)
+    fisher_yates_shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
@@ -170,7 +181,7 @@ def experiment8(n, m, k):
         c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
-    shuffle(all_keys)
+    fisher_yates_shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
