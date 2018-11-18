@@ -23,20 +23,16 @@ class BloomFilter:
         self.bloom_filter = array('B', [0]) * m
         self.m = m
         self.k = k
-        # initialize an array of universal hash functions
-        self.hash_functions = []
+        # initialize arrays to hold values for the universal hash functions
+        self.c_values = []
+        self.d_values = []
         for _ in range(k):
             # generate two random parameters
             c = randint(1, P - 1)
             d = randint(0, P - 1)
 
-            def universal_hash(x):
-                return ((c * x + d) % P) % m
-
-            # record the hash parameters for easy access later
-            universal_hash.c = c
-            universal_hash.d = d
-            self.hash_functions.append(universal_hash)
+            self.c_values.append(c)
+            self.d_values.append(d)
 
     def hash(self, i):
         """
@@ -44,7 +40,10 @@ class BloomFilter:
         :param i: the item to hash
         :return: the array of hash values
         """
-        return [h(i) for h in self.hash_functions]
+        ret = []
+        for h in range(self.k):
+            ret.append(((self.c_values[h] * i + self.d_values[h]) % P) % self.m)
+        return ret
 
     def is_marked(self, i):
         """

@@ -137,6 +137,7 @@ def experiment6(n, m, k):
         c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
+    fisher_yates_shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
@@ -159,6 +160,7 @@ def experiment7(n, m, k):
         c_list[e]=c
         for _ in range(c):
             all_keys.append(e)
+    fisher_yates_shuffle(all_keys)
     for e in all_keys:
         bf.insert(e)
     # Check the false-positive rate
