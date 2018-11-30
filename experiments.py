@@ -224,6 +224,7 @@ experiments = [experiment1, experiment2, experiment3, experiment4,
 
 
 def proc_experiments(rounds, e, n, m, k, output):
+    #print("Processing Experiment",e,n, m, k) 
     results = []
     for _ in range(rounds):
         results.append(experiments[e](n, m, k))
@@ -234,42 +235,42 @@ def proc_experiments(rounds, e, n, m, k, output):
 NUM_ROUNDS = 100
 
 # N = 10000
-M = 40000
-K = 6 # 4, 6, 8
+M = [80000,160000,320000]
+K = [4,8] # 4, 6, 8
 
 NM = [0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25]
 # NM = np.linspace(0.05, 0.25, 11)# values of N/M
 
 # Create csv file for output
-filename = "output-{0}-{1}.csv".format(M, K)
-f = open(filename, 'w')
-f.write("N/M,exp1-mean,exp1-std,exp2-mean,exp2-std,exp3-mean,exp3-std,exp4-mean,exp4-std,exp5-mean,exp5-std,"
+for k in K:
+    print("K =", k)
+    for m in M:
+        print("M =", m)
+        filename = "output-{0}-{1}.csv".format(m, k)
+        f = open(filename, 'w')
+        f.write("N/M,exp1-mean,exp1-std,exp2-mean,exp2-std,exp3-mean,exp3-std,exp4-mean,exp4-std,exp5-mean,exp5-std,"
         "exp6-mean,exp6-std,exp7-mean,exp7-std,exp8-mean,exp8-std\n")
 
-for nm in NM:
-    print("\nN/M =", nm)
-    N = int(nm * M)
-    f.write("{0}".format(nm))
+        for nm in NM:
+            print("N/M =", nm)
+            N = int(nm * m)
+            f.write("{0}".format(nm))
 
-    for e in range(8):
-        fp_rates = []
-        print("Running Experiment", e+1)
-        num_procs = 4
-        output = mp.Queue()
-        processes = [mp.Process(target=proc_experiments, args=(int(NUM_ROUNDS/num_procs), e, N, M, K, output)) for _ in range(num_procs)]
-        for p in processes:
-            p.start()
-        for p in processes:
-            p.join()
+            for e in range(8):
+                fp_rates = []
+                print("Running Experiment", e+1)
+                num_procs = 4
+                output = mp.Queue()
+                processes = [mp.Process(target=proc_experiments, args=(int(NUM_ROUNDS/num_procs), e, N, m, k, output)) for _ in range(num_procs)]
+                for p in processes:
+                    #print("Starting process ", p)
+                    p.start()
+                for p in processes:
+                    #print("Ending process ", p)
+                    p.join()
+                for p in processes:
+                    fp_rates = fp_rates + output.get()
+                f.write(",{0},{1}".format(np.mean(fp_rates), np.std(fp_rates)))
 
-        # for i in range(NUM_ROUNDS):
-        #     if i % 5 == 0:
-        #         print("  iter: ", i)
-        #     fp_rates.append(experiments[e](N, M, K))
-        for p in processes:
-            fp_rates = fp_rates + output.get()
-        f.write(",{0},{1}".format(np.mean(fp_rates), np.std(fp_rates)))
-
-    f.write("\n")
-
-f.close()
+                f.write("\n")
+        f.close()
