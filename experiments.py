@@ -272,5 +272,5 @@ for k in K:
                     fp_rates = fp_rates + output.get()
                 f.write(",{0},{1}".format(np.mean(fp_rates), np.std(fp_rates)))
 
-                f.write("\n")
+            f.write("\n")
         f.close()
