@@ -1,3 +1,8 @@
+"""
+    Simple file for testing our implementation of the bloom filters
+    Was not used in empirical analysis/running of experiments.
+"""
+
 from bloom_filter import RazorBloomFilter
 
 

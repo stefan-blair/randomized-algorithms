@@ -1,3 +1,15 @@
+"""
+    This file contains the implementation of the Bloom filters that were
+        described in the paper. Note that only the
+        RevisedExtendedBloomFilter was used to run our experiments.
+    Important function to note is the has_false_positive function, which
+        implements the false-positive detection described in the paper, which
+        compares the actual insertion count to the minimum count in the Bloom
+        filter for that element.
+    Also important is the insert function in RevisedExtendedBloomFilter, which
+        properly defines the differences between the Revised and Intuitive versions
+        that are described in the paper.
+"""
 from array import array
 from random import randint
 
@@ -119,6 +131,10 @@ class IntuitiveExtendedBloomFilter(BloomFilter):
 
 class RevisedExtendedBloomFilter(IntuitiveExtendedBloomFilter):
 
+    """
+    Note-worthy insertion function as it implements the 2 heuristics described
+        in the paper to avoid global and local coincidental hits.
+    """
     def insert(self, i):
         # find the minimum count indexed by any of the hashes
         minimum = min([self.bloom_filter[h] for h in self.hash(i)])
